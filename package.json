@@ -32,16 +32,6 @@
         "icon": "$(paintcan)"
       },
       {
-        "command": "log-analysis.enableVisibility",
-        "title": "Enable Visbility",
-        "icon": "$(eye)"
-      },
-      {
-        "command": "log-analysis.disableVisibility",
-        "title": "Disable Visbility",
-        "icon": "$(eye-closed)"
-      },
-      {
         "command": "log-analysis.turnOnFocusMode",
         "title": "Turn on Focus Mode",
         "icon": "$(symbol-keyword)"
@@ -88,16 +78,6 @@
           "group": "inline@3"
         },
         {
-          "command": "log-analysis.disableVisibility",
-          "when": "view == filters && viewItem =~ /-visible/",
-          "group": "inline@4"
-        },
-        {
-          "command": "log-analysis.enableVisibility",
-          "when": "view == filters && viewItem =~ /-invisible/",
-          "group": "inline@5"
-        },
-        {
           "command": "log-analysis.deleteFilter",
           "when": "view == filters",
           "group": "inline@6"
@@ -135,7 +115,8 @@
       "explorer": [
         {
           "id": "filters",
-          "name": "Filters"
+          "name": "Log Filters",
+          "icon": "image/icon.png"
         }
       ]
     }

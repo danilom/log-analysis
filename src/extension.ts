@@ -43,10 +43,18 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(disposableFocus);
   //register filterTreeViewProvider under id 'filters' which gets attached
   //to the file explorer according to package.json's contributes>views>explorer
-  vscode.window.registerTreeDataProvider(
-    "filters",
-    state.filterTreeViewProvider
-  );
+  const treeView = vscode.window.createTreeView("filters", {
+    treeDataProvider: state.filterTreeViewProvider,
+  });
+  
+  // Handle checkbox state changes
+  const disposableCheckboxChange = treeView.onDidChangeCheckboxState((event) => {
+    for (const [item, checkboxState] of event.items) {
+      const isShown = checkboxState === vscode.TreeItemCheckboxState.Checked;
+      setVisibility(isShown, item, state);
+    }
+  });
+  context.subscriptions.push(disposableCheckboxChange);
 
   //Add events listener
   var disposableOnDidChangeVisibleTextEditors =
@@ -81,20 +89,6 @@ export function activate(context: vscode.ExtensionContext) {
     () => importFilters(state)
   );
   context.subscriptions.push(disposableImport);
-
-  let disposableEnableVisibility = vscode.commands.registerCommand(
-    "log-analysis.enableVisibility",
-    (filterTreeItem: vscode.TreeItem) =>
-      setVisibility(true, filterTreeItem, state)
-  );
-  context.subscriptions.push(disposableEnableVisibility);
-
-  let disposableDisableVisibility = vscode.commands.registerCommand(
-    "log-analysis.disableVisibility",
-    (filterTreeItem: vscode.TreeItem) =>
-      setVisibility(false, filterTreeItem, state)
-  );
-  context.subscriptions.push(disposableDisableVisibility);
 
   let disposableTurnOnFocusMode = vscode.commands.registerCommand(
     "log-analysis.turnOnFocusMode",
