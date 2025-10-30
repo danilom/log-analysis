@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { State } from "./extension";
-import { generateColorFromText, generateSvgUri } from "./utils";
+import { Filter, generateColorFromText, generateSvgUri } from "./utils";
 
 export function applyHighlight(
   state: State,
@@ -174,20 +174,25 @@ export function addFilter(state: State) {
       if (regexStr === undefined) {
         return;
       }
-      const id = `${Math.random()}`;
-      const color = generateColorFromText(regexStr);
-      const filter = {
-        isHighlighted: true,
-        isShown: true,
-        regex: new RegExp(regexStr),
-        color: color,
-        id,
-        iconPath: generateSvgUri(color, true),
-        count: 0,
-      };
-      state.filterArr.push(filter);
+      createFilter(regexStr, state);
       refreshEditors(state);
     });
+}
+
+let _nextFilterId = 1;
+export function createFilter(regexStr: string, state: State) {
+  const id = `${_nextFilterId++}`;
+  const color = generateColorFromText(regexStr);
+  const filter: Filter = {
+    isHighlighted: true,
+    isShown: true,
+    regex: new RegExp(regexStr),
+    color: color,
+    id,
+    iconPath: generateSvgUri(color, true),
+    count: 0,
+  };
+  state.filterArr.push(filter);
 }
 
 export function editFilter(filterTreeItem: vscode.TreeItem, state: State) {

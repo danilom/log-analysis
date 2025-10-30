@@ -37,6 +37,11 @@
         "icon": "$(symbol-keyword)"
       },
       {
+        "command": "log-analysis.extractFilters",
+        "title": "Extract Filters from Current File",
+        "icon": "$(file-code)"
+      },
+      {
         "command": "log-analysis.deleteFilter",
         "title": "Delete This Filter",
         "icon": "$(dialog-close)"
@@ -91,6 +96,11 @@
         },
         {
           "command": "log-analysis.turnOnFocusMode",
+          "when": "view == filters",
+          "group": "navigation"
+        },
+        {
+          "command": "log-analysis.extractFilters",
           "when": "view == filters",
           "group": "navigation"
         },
