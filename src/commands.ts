@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { State } from "./extension";
-import { generateRandomColor, generateSvgUri } from "./utils";
+import { generateColorFromText, generateSvgUri } from "./utils";
 
 export function applyHighlight(
   state: State,
@@ -175,7 +175,7 @@ export function addFilter(state: State) {
         return;
       }
       const id = `${Math.random()}`;
-      const color = generateRandomColor();
+      const color = generateColorFromText(regexStr);
       const filter = {
         isHighlighted: true,
         isShown: true,
