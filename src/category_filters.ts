@@ -1,11 +1,12 @@
-import { addFilter, createFilter, refreshEditors } from "./commands";
+import { refreshEditors } from "./commands";
 import { State } from "./extension";
 import * as vscode from "vscode";
+import { CategoryFilter } from "./filter";
 
-export function extractFilters(state: State) {
+export function extractCategoryFilters(state: State) {
     // TODO: make the filter configurable
     // 12:42:01.371 install:reso 
-    const filterRegex = /^[^ ]+ ([^ ]+) /;
+    const categoryRegex = /^[^ ]+ ([^ ]+) /;
 
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
@@ -16,18 +17,19 @@ export function extractFilters(state: State) {
     const documentText = editor.document.getText();
     const lines = documentText.split(/\r?\n/);
 
-    const filterTexts = new Set<string>();
+    const categories = new Set<string>();
     for (const line of lines) {
-        const match = line.match(filterRegex);
+        const match = line.match(categoryRegex);
         if (match) {
             // TODO: plaintext vs regex
-            const filterText = match[1].trim();
-            filterTexts.add(filterText);
+            const catName = match[1].trim();
+            categories.add(catName);
         }
     }
 
-    for (const filterText of filterTexts) {
-        createFilter(filterText, state);
+    for (const cat of categories) {
+        const filter = new CategoryFilter(cat, categoryRegex);
+        state.filterArr.push(filter);
     }
     refreshEditors(state);
 }

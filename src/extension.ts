@@ -11,10 +11,11 @@ import {
     setVisibility,
     turnOnFocusMode,
 } from "./commands";
+
 import { FilterTreeViewProvider } from "./filterTreeViewProvider";
 import { FocusProvider } from "./focusProvider";
-import { Filter } from "./utils";
-import { extractFilters } from "./cmdExtractFilters";
+import { extractCategoryFilters } from "./category_filters";
+import { Filter } from "./filter";
 
 export type State = {
     inFocusMode: boolean;
@@ -99,7 +100,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     let disposableExtractFilters = vscode.commands.registerCommand(
         "log-analysis.extractFilters",
-        () => extractFilters(state)
+        () => extractCategoryFilters(state)
     );
     context.subscriptions.push(disposableExtractFilters);
 

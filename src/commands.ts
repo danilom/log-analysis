@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { State } from "./extension";
-import { Filter, generateColorFromText, generateSvgUri } from "./utils";
+import { generateSvgUri } from "./utils";
+import { CategoryFilter, Filter, RegexFilter } from "./filter";
 
 export function applyHighlight(
     state: State,
@@ -25,7 +26,7 @@ export function applyHighlight(
             ) {
                 let lineNumbers: number[] = [];
                 for (let lineIdx = 0; lineIdx < sourceCodeArr.length; lineIdx++) {
-                    if (filter.regex.test(sourceCodeArr[lineIdx])) {
+                    if (filter.isMatch(sourceCodeArr[lineIdx])) {
                         lineNumbers.push(lineIdx);
                     }
                 }
@@ -57,12 +58,7 @@ export function applyHighlight(
 export function exportFilters(state: State) {
     const content = JSON.stringify(
         state.filterArr.map((filter) => {
-            return {
-                regexText: filter.regex.source,
-                color: filter.color,
-                isHighlighted: filter.isHighlighted,
-                isShown: filter.isShown,
-            };
+            return filter.toJSON();
         })
     );
     vscode.workspace.openTextDocument({
@@ -95,26 +91,14 @@ export function importFilters(state: State) {
             }
             const array = parsed as any[];
             array.forEach((filterText) => {
-                if (
-                    typeof filterText.regexText === "string" &&
-                    typeof filterText.color === "string" &&
-                    typeof filterText.isHighlighted === "boolean" &&
-                    typeof filterText.isShown === "boolean"
-                ) {
-                    const id = `${Math.random()}`;
-                    const filter = {
-                        regex: new RegExp(filterText.regexText),
-                        color: filterText.color as string,
-                        isHighlighted: filterText.isHighlighted as boolean,
-                        isShown: filterText.isShown as boolean,
-                        id,
-                        iconPath: generateSvgUri(
-                            filterText.color as string,
-                            filterText.isHighlighted
-                        ),
-                        count: 0,
-                    };
-                    state.filterArr.push(filter);
+                try {
+                    const filter = Filter.fromJSON(filterText);
+                    state.filterArr.push(filter!);
+                }
+                catch (e) {
+                    vscode.window.showWarningMessage(
+                        "Invalid filter entry found during import, skipping."
+                    );
                 }
             });
             refreshEditors(state);
@@ -174,25 +158,11 @@ export function addFilter(state: State) {
             if (regexStr === undefined) {
                 return;
             }
-            createFilter(regexStr, state);
+            const regex = new RegExp(regexStr);
+            const filter = new RegexFilter(regex);
+            state.filterArr.push(filter);
             refreshEditors(state);
         });
-}
-
-let _nextFilterId = 1;
-export function createFilter(regexStr: string, state: State) {
-    const id = `${_nextFilterId++}`;
-    const color = generateColorFromText(regexStr);
-    const filter: Filter = {
-        isHighlighted: true,
-        isShown: true,
-        regex: new RegExp(regexStr),
-        color: color,
-        id,
-        iconPath: generateSvgUri(color, true),
-        count: 0,
-    };
-    state.filterArr.push(filter);
 }
 
 export function editFilter(filterTreeItem: vscode.TreeItem, state: State) {
@@ -207,7 +177,7 @@ export function editFilter(filterTreeItem: vscode.TreeItem, state: State) {
             }
             const id = filterTreeItem.id;
             const filter = state.filterArr.find((filter) => filter.id === id);
-            filter!.regex = new RegExp(regexStr);
+            filter!.edit(regexStr);
             refreshEditors(state);
         });
 }

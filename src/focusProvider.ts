@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { Filter } from "./utils";
+import { Filter } from "./filter";
 
 //Provide virtual documents as a strings that only contain lines matching shown filters.
 //These virtual documents have uris of the form "focus:<original uri>" where
@@ -26,8 +26,7 @@ export class FocusProvider implements vscode.TextDocumentContentProvider {
                 if (!filter.isShown) {
                     continue;
                 }
-                let regex = filter.regex;
-                if (regex.test(line)) {
+                if (filter.isMatch(line)) {
                     resultArr.push(line);
                     break;
                 }

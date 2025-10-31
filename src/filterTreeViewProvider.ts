@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { Filter } from "./utils";
+import { Filter } from "./filter";
 
 //provides filters as tree items to be displayed on the sidebar
 export class FilterTreeViewProvider
@@ -35,10 +35,9 @@ export class FilterTreeViewProvider
 //represents a filter as one row in the sidebar
 export class FilterItem extends vscode.TreeItem {
 
-
     constructor(filter: Filter) {
-        super(filter.regex.toString());
-        this.label = filter.regex.toString();
+        super(filter.getLabel());
+        this.label = filter.getLabel();
         this.id = filter.id;
         this.iconPath = filter.iconPath;
 

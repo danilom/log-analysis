@@ -1,17 +1,6 @@
 import * as vscode from "vscode";
 const crypto = require('crypto');
 
-// One filter corresponds to one line in the configuration file
-export type Filter = {
-    isHighlighted: boolean; // if the matching lines will be highlighted
-    isShown: boolean; //if the matching lines will be kept in focus mode
-    regex: RegExp;
-    color: string;
-    id: string; //random generated number
-    iconPath: vscode.Uri; //dataUri representing the isHighlighted/isNotHighlighted svg icon
-    count: number; //count of lines which match the filter in the active editor
-};
-
 function getStringHash(text: string): number {
     if (text.length === 0) { return 0; }
     return parseInt(crypto.createHash('sha1').update(text).digest('hex').slice(0, 8), 16);
